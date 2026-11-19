@@ -84,14 +84,12 @@ export default function App() {
     localStorage.setItem("vouch8_theme", theme);
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
     }
   }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
 
   // Wagmi Hooks
   const { address, isConnected, chainId } = useAccount();
@@ -442,7 +440,7 @@ export default function App() {
   const taskStatus = inspectedTask ? inspectedTask[11] : null;
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-gray-900 transition-colors duration-150 dark:bg-[#0B0F17] dark:text-gray-100">
+    <div className={`${theme === "dark" ? "dark" : ""} min-h-screen bg-[#FAFAFA] text-gray-900 transition-colors duration-150 dark:bg-[#0B0F17] dark:text-gray-100`}>
       {/* ================= TOP NAVIGATION BAR ================= */}
       <header className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-white/90 backdrop-blur-md dark:border-[#1F2937] dark:bg-[#0B0F17]/90">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
@@ -499,40 +497,49 @@ export default function App() {
             </div>
           </div>
 
-          {/* Right Controls: Theme Toggle & Wallet Badge */}
+          {/* Right Controls: Segmented Theme Toggle & Wallet Badge */}
           <div className="flex items-center gap-2.5">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle Theme"
-              className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
-            >
-              {theme === "dark" ? (
-                <>
-                  <svg className="h-3.5 w-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
-                  </svg>
-                  <span>Light</span>
-                </>
-              ) : (
-                <>
-                  <svg className="h-3.5 w-3.5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                    />
-                  </svg>
-                  <span>Dark</span>
-                </>
-              )}
-            </button>
+            {/* Segmented Light / Dark Toggle */}
+            <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 text-xs font-medium dark:border-gray-800 dark:bg-gray-900">
+              <button
+                type="button"
+                onClick={() => setTheme("light")}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                  theme === "light"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                <svg className="h-3.5 w-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+                <span>Light</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme("dark")}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                  theme === "dark"
+                    ? "bg-gray-800 text-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                <svg className="h-3.5 w-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
+                </svg>
+                <span>Dark</span>
+              </button>
+            </div>
 
             {/* Wrong Network Switch Button */}
             {isConnected && chainId !== qdayAevum.id && (
