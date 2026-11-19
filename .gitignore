@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Environment variables
+.env
+.env.*
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
