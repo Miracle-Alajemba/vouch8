@@ -15,14 +15,15 @@ export const qdayAevum = defineChain({
 export const TUSD8_ADDRESS = "0x456569838f1d43009A91ebA4263147Afd7233483" as const;
 
 export const VOUCH8_ADDRESSES = {
-  registry: (import.meta.env.VITE_REGISTRY_ADDRESS || "0x0000000000000000000000000000000000000000") as `0x${string}`,
-  escrow: (import.meta.env.VITE_ESCROW_ADDRESS || "0x0000000000000000000000000000000000000000") as `0x${string}`,
-  vault: (import.meta.env.VITE_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000") as `0x${string}`,
+  registry: (import.meta.env.VITE_REGISTRY_ADDRESS || "0x8EA1be949E6FB94f5D0c110D216E06Cdb328D346") as `0x${string}`,
+  escrow: (import.meta.env.VITE_ESCROW_ADDRESS || "0xDc2dD9C095a9EfB8526A9Afc752398dD79aAd8dA") as `0x${string}`,
+  vault: (import.meta.env.VITE_VAULT_ADDRESS || "0x15Bc8eB8e182B4961ace0F0ebDB2f9eB20AaC629") as `0x${string}`,
 };
 
 export const ERC20_ABI = [
   { name: "approve", type: "function", stateMutability: "nonpayable", inputs: [{ name: "spender", type: "address" }, { name: "amount", type: "uint256" }], outputs: [{ type: "bool" }] },
   { name: "balanceOf", type: "function", stateMutability: "view", inputs: [{ name: "account", type: "address" }], outputs: [{ type: "uint256" }] },
+  { name: "decimals", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint8" }] },
 ] as const;
 
 export const VAULT_ABI = [
@@ -31,11 +32,29 @@ export const VAULT_ABI = [
   { name: "grantSession", type: "function", stateMutability: "nonpayable", inputs: [{ name: "agentKey", type: "address" }, { name: "maxPerTask", type: "uint256" }, { name: "dailyLimit", type: "uint256" }, { name: "durationSeconds", type: "uint64" }], outputs: [] },
   { name: "revokeSession", type: "function", stateMutability: "nonpayable", inputs: [{ name: "agentKey", type: "address" }], outputs: [] },
   { name: "balances", type: "function", stateMutability: "view", inputs: [{ name: "owner", type: "address" }], outputs: [{ type: "uint256" }] },
+  { name: "sessions", type: "function", stateMutability: "view", inputs: [{ name: "agentKey", type: "address" }], outputs: [
+    { name: "owner", type: "address" },
+    { name: "maxPerTask", type: "uint256" },
+    { name: "dailyLimit", type: "uint256" },
+    { name: "spentInWindow", type: "uint256" },
+    { name: "windowStart", type: "uint64" },
+    { name: "expiresAt", type: "uint64" },
+    { name: "revoked", type: "bool" }
+  ]},
 ] as const;
 
 export const REGISTRY_ABI = [
   { name: "registerAgent", type: "function", stateMutability: "nonpayable", inputs: [{ name: "handle", type: "string" }, { name: "metadataURI", type: "string" }, { name: "payoutWallet", type: "address" }], outputs: [{ type: "uint256" }] },
-  { name: "profiles", type: "function", stateMutability: "view", inputs: [{ name: "agent", type: "address" }], outputs: [{ name: "agentId", type: "uint256" }, { name: "handle", type: "string" }, { name: "payoutWallet", type: "address" }, { name: "completedTasks", type: "uint256" }, { name: "missedTasks", type: "uint256" }, { name: "reputationScore", type: "uint256" }, { name: "active", type: "bool" }] },
+  { name: "isVerifiedAgent", type: "function", stateMutability: "view", inputs: [{ name: "agent", type: "address" }, { name: "minReputation", type: "uint256" }], outputs: [{ type: "bool" }] },
+  { name: "profiles", type: "function", stateMutability: "view", inputs: [{ name: "agent", type: "address" }], outputs: [
+    { name: "agentId", type: "uint256" },
+    { name: "handle", type: "string" },
+    { name: "payoutWallet", type: "address" },
+    { name: "completedTasks", type: "uint256" },
+    { name: "missedTasks", type: "uint256" },
+    { name: "reputationScore", type: "uint256" },
+    { name: "active", type: "bool" }
+  ]},
 ] as const;
 
 export const ESCROW_ABI = [
@@ -44,4 +63,19 @@ export const ESCROW_ABI = [
   { name: "awardBid", type: "function", stateMutability: "nonpayable", inputs: [{ name: "taskId", type: "uint256" }, { name: "worker", type: "address" }], outputs: [] },
   { name: "settleTask", type: "function", stateMutability: "nonpayable", inputs: [{ name: "taskId", type: "uint256" }, { name: "resultHash", type: "bytes32" }], outputs: [] },
   { name: "claimTimeoutRefund", type: "function", stateMutability: "nonpayable", inputs: [{ name: "taskId", type: "uint256" }], outputs: [] },
+  { name: "nextTaskId", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  { name: "tasks", type: "function", stateMutability: "view", inputs: [{ name: "taskId", type: "uint256" }], outputs: [
+    { name: "id", type: "uint256" },
+    { name: "orchestratorKey", type: "address" },
+    { name: "vaultOwner", type: "address" },
+    { name: "specHash", type: "bytes32" },
+    { name: "maxBudget", type: "uint256" },
+    { name: "slaDuration", type: "uint64" },
+    { name: "minReputation", type: "uint256" },
+    { name: "winningWorker", type: "address" },
+    { name: "lockedAmount", type: "uint256" },
+    { name: "deadline", type: "uint64" },
+    { name: "resultHash", type: "bytes32" },
+    { name: "status", type: "uint8" }
+  ]},
 ] as const;
