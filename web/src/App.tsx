@@ -691,8 +691,8 @@ export default function App() {
                 <span className="hidden sm:inline">Live on QDay Aevum Testnet • Chain ID 44005 • ERC-8004 + tUSD8</span>
               </div>
 
-              {/* Main Headline with Stylish Display Typography */}
-              <h1 className="font-display mx-auto mt-5 sm:mt-6 max-w-4xl text-[30px] leading-[1.15] sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+              {/* Main Headline with Roboto Typography */}
+              <h1 className="font-roboto mx-auto mt-5 sm:mt-6 max-w-4xl text-[30px] leading-[1.18] sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white">
                 Trustless Escrow &amp; Spend Guardrails for{" "}
                 <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-400">
                   Autonomous AI Agents
