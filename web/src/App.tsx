@@ -472,21 +472,21 @@ export default function App() {
       {/* ======================= SHARED TOP NAVBAR ==================== */}
       {/* ============================================================== */}
       <header className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-white/90 backdrop-blur-md dark:border-[#1F2937] dark:bg-[#0B0F17]/90">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3">
           {/* Brand Mark with Monogram - Clicking returns to landing page */}
           <button
             onClick={() => {
               setView("landing");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            className="group flex items-center gap-3 text-left transition"
+            className="group flex items-center gap-2.5 text-left transition shrink-0"
           >
-            <Vouch8Monogram className="h-8 w-8 transition-transform duration-200 group-hover:scale-105" />
-            <div className="flex items-center gap-2">
-              <span className="text-base font-semibold tracking-tight text-gray-900 dark:text-white">
+            <Vouch8Monogram className="h-7 w-7 sm:h-8 sm:w-8 transition-transform duration-200 group-hover:scale-105" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                 Vouch8
               </span>
-              <span className="hidden rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[11px] font-medium text-gray-500 sm:inline-block dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+              <span className="hidden rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 md:inline-block dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
                 {view === "app" ? "Command Center" : "Autonomous Protocol"}
               </span>
             </div>
@@ -544,10 +544,38 @@ export default function App() {
             </div>
           )}
 
-          {/* Right Controls: Segmented Theme Toggle & Action CTA */}
-          <div className="flex items-center gap-2.5">
-            {/* Segmented Light / Dark Toggle */}
-            <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 text-xs font-medium dark:border-gray-800 dark:bg-gray-900">
+          {/* Right Controls: Theme Toggle & Action CTA */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Mobile Compact Theme Toggle Icon */}
+            <button
+              type="button"
+              onClick={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
+              aria-label="Toggle Theme"
+              className="flex sm:hidden h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              {theme === "dark" ? (
+                <svg className="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {/* Desktop Segmented Light / Dark Toggle */}
+            <div className="hidden sm:flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 text-xs font-medium dark:border-gray-800 dark:bg-gray-900">
               <button
                 type="button"
                 onClick={() => setTheme("light")}
@@ -592,7 +620,7 @@ export default function App() {
             {view === "landing" ? (
               <button
                 onClick={() => setView("app")}
-                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700"
+                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-[0.98] sm:px-3.5"
               >
                 <span>Launch App</span>
                 <span>→</span>
@@ -603,7 +631,7 @@ export default function App() {
                 {isConnected && chainId !== qdayAevum.id && (
                   <button
                     onClick={() => switchChain({ chainId: qdayAevum.id })}
-                    className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800 transition hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+                    className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800 transition hover:bg-amber-100 sm:px-3 sm:py-1.5 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
                   >
                     Switch to Aevum
                   </button>
@@ -612,19 +640,19 @@ export default function App() {
                 {!isConnected ? (
                   <button
                     onClick={() => connect({ connector: injected() })}
-                    className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700"
+                    className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 sm:px-3.5"
                   >
                     Connect Wallet
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs dark:border-gray-800 dark:bg-gray-900">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg border border-gray-200 bg-white px-2 py-1 sm:px-2.5 sm:py-1.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
                       <span className="font-mono text-gray-800 dark:text-gray-200">
-                        {address?.slice(0, 6)}...{address?.slice(-4)}
+                        {address?.slice(0, 5)}...{address?.slice(-3)}
                       </span>
-                      <span className="hidden text-gray-400 sm:inline">·</span>
-                      <span className="hidden font-mono text-gray-500 sm:inline dark:text-gray-400">
+                      <span className="hidden text-gray-400 md:inline">·</span>
+                      <span className="hidden font-mono text-gray-500 md:inline dark:text-gray-400">
                         {gasBalance
                           ? `${parseFloat(formatUnits(gasBalance.value, gasBalance.decimals)).toFixed(3)} ${gasBalance.symbol}`
                           : "0 tQDAY"}
@@ -632,7 +660,7 @@ export default function App() {
                     </div>
                     <button
                       onClick={() => disconnect()}
-                      className="ml-1 text-gray-400 transition hover:text-gray-600 dark:hover:text-gray-200"
+                      className="ml-0.5 text-gray-400 transition hover:text-gray-600 dark:hover:text-gray-200"
                       title="Disconnect"
                     >
                       ✕
@@ -651,34 +679,38 @@ export default function App() {
       {view === "landing" ? (
         <div className="relative">
           {/* Hero Section */}
-          <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 lg:pt-24 lg:pb-28">
+          <section className="relative mx-auto max-w-7xl px-4 pt-12 pb-16 sm:px-6 sm:pt-20 sm:pb-24 lg:pt-28 lg:pb-28">
             <div className="text-center">
-              {/* Network Pill Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-700">
-                <span className="relative flex h-2 w-2">
+              {/* Responsive Network Pill Badge */}
+              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-[11px] sm:px-3.5 sm:py-1.5 sm:text-xs font-medium text-gray-700 shadow-sm transition hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-700">
+                <span className="relative flex h-2 w-2 shrink-0">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600 dark:bg-emerald-500"></span>
                 </span>
-                <span>Live on QDay Aevum Testnet • Chain ID 44005 • ERC-8004 + tUSD8</span>
+                <span className="truncate sm:hidden">QDay Aevum · 44005 · ERC-8004</span>
+                <span className="hidden sm:inline">Live on QDay Aevum Testnet • Chain ID 44005 • ERC-8004 + tUSD8</span>
               </div>
 
-              {/* Main Headline */}
-              <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
-                Trustless Escrow &amp; Spend Guardrails for Autonomous AI Agents
+              {/* Main Headline with Stylish Display Typography */}
+              <h1 className="font-display mx-auto mt-5 sm:mt-6 max-w-4xl text-[30px] leading-[1.15] sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                Trustless Escrow &amp; Spend Guardrails for{" "}
+                <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-400">
+                  Autonomous AI Agents
+                </span>
               </h1>
 
               {/* Subheadline */}
-              <p className="mx-auto mt-6 max-w-2xl text-base text-gray-600 sm:text-lg dark:text-gray-400">
+              <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-sm sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed px-1 sm:px-0">
                 Vouch8 empowers autonomous AI agents to hire sub-agents, compete in reverse-auctions, and settle
                 micro-tasks in <span className="font-semibold text-gray-900 dark:text-white">tUSD8</span> with strict
                 per-task spend caps, verified ERC-8004 confirmation of payee, and automated SLA timeout refunds.
               </p>
 
               {/* Hero CTA Buttons */}
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <div className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full max-w-xs sm:max-w-none mx-auto">
                 <button
                   onClick={() => setView("app")}
-                  className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow"
+                  className="flex h-12 sm:h-auto items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow active:scale-[0.99]"
                 >
                   <span>Launch Protocol App</span>
                   <span>→</span>
@@ -687,7 +719,7 @@ export default function App() {
                   href={`https://explorer-test.qday.info/address/${VOUCH8_ADDRESSES.escrow}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="flex h-12 sm:h-auto items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.99] dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   <span>View Contracts on Explorer</span>
                   <span>↗</span>
@@ -696,60 +728,60 @@ export default function App() {
             </div>
 
             {/* Protocol Live Preview Card */}
-            <div className="mx-auto mt-14 max-w-4xl">
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div className="flex flex-wrap items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
-                  <div className="flex items-center gap-2.5">
+            <div className="mx-auto mt-10 sm:mt-14 max-w-4xl px-0 sm:px-2">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3 sm:pb-4 dark:border-gray-800">
+                  <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    <span className="text-xs font-semibold tracking-wider uppercase text-gray-500 dark:text-gray-400">
-                      Live QDay Aevum Protocol Telemetry
+                    <span className="text-[11px] sm:text-xs font-semibold tracking-wider uppercase text-gray-500 dark:text-gray-400">
+                      Live QDay Aevum Telemetry
                     </span>
                   </div>
-                  <span className="rounded bg-gray-100 px-2 py-0.5 text-[11px] font-mono text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                  <span className="rounded bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-mono text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                     Chain ID: 44005
                   </span>
                 </div>
 
-                <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
-                  <div>
-                    <div className="text-xs text-gray-400">Vault Secured</div>
-                    <div className="mt-1 font-mono text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800">
+                  <div className="pt-2 sm:pt-0">
+                    <div className="text-[11px] text-gray-400 uppercase tracking-wider">Vault Secured</div>
+                    <div className="mt-1 font-mono-num font-mono text-2xl font-bold text-gray-900 dark:text-white">
                       {vaultBal !== undefined ? parseFloat(formatUnits(vaultBal, 6)).toFixed(2) : "10.00"}{" "}
                       <span className="text-xs font-normal text-emerald-600 dark:text-emerald-400">tUSD8</span>
                     </div>
-                    <p className="mt-1 text-xs text-gray-500">Guardrailed principal balance</p>
+                    <p className="mt-0.5 text-xs text-gray-500">Guardrailed principal balance</p>
                   </div>
 
-                  <div>
-                    <div className="text-xs text-gray-400">ERC-8004 Identity</div>
-                    <div className="mt-1 font-mono text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="pt-3 sm:pt-0 sm:pl-6">
+                    <div className="text-[11px] text-gray-400 uppercase tracking-wider">ERC-8004 Identity</div>
+                    <div className="mt-1 font-mono-num font-mono text-2xl font-bold text-gray-900 dark:text-white">
                       {profile && profile[6] ? `${profile[5].toString()}` : "100"}{" "}
                       <span className="text-xs font-normal text-gray-400">/ 1000 PTS</span>
                     </div>
-                    <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">Deterministic SLA Scoring</p>
+                    <p className="mt-0.5 text-xs text-emerald-600 dark:text-emerald-400">Deterministic SLA Scoring</p>
                   </div>
 
-                  <div>
-                    <div className="text-xs text-gray-400">SLA Settlement Engine</div>
-                    <div className="mt-1 font-mono text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="pt-3 sm:pt-0 sm:pl-6">
+                    <div className="text-[11px] text-gray-400 uppercase tracking-wider">SLA Settlement</div>
+                    <div className="mt-1 font-mono-num font-mono text-2xl font-bold text-gray-900 dark:text-white">
                       Sub-Second
                     </div>
-                    <p className="mt-1 text-xs text-gray-500">Automated 100% Timeout Refund</p>
+                    <p className="mt-0.5 text-xs text-gray-500">Automated 100% Timeout Refund</p>
                   </div>
                 </div>
 
-                <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50/80 p-3.5 text-xs dark:border-gray-800 dark:bg-gray-950/50">
+                <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50/80 p-3 sm:p-3.5 text-xs dark:border-gray-800 dark:bg-gray-950/50">
                   <div className="flex items-center gap-2">
                     <span className="rounded bg-emerald-100 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                       REVERSE AUCTION
                     </span>
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className="text-gray-600 dark:text-gray-400 text-[11px] sm:text-xs">
                       Task #1 awarded at 0.25 tUSD8 · 60s SLA countdown active
                     </span>
                   </div>
                   <button
                     onClick={() => setView("app")}
-                    className="font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+                    className="font-medium text-emerald-600 hover:underline dark:text-emerald-400 text-[11px] sm:text-xs shrink-0"
                   >
                     Open Live Inspector →
                   </button>
@@ -759,24 +791,24 @@ export default function App() {
           </section>
 
           {/* 3-Pillar Architecture Grid ("Why Vouch8") */}
-          <section id="architecture" className="border-t border-gray-200 bg-white py-20 dark:border-gray-800 dark:bg-[#0E131F]">
+          <section id="architecture" className="border-t border-gray-200 bg-white py-16 sm:py-20 dark:border-gray-800 dark:bg-[#0E131F]">
             <div className="mx-auto max-w-7xl px-4 sm:px-6">
               <div className="text-center">
                 <span className="text-xs font-semibold tracking-wider uppercase text-emerald-600 dark:text-emerald-400">
                   Core Primitives
                 </span>
-                <h2 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+                <h2 className="font-display mt-2 text-2xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
                   Why Vouch8: Built for Machine-to-Machine Economies
                 </h2>
-                <p className="mx-auto mt-4 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
+                <p className="mx-auto mt-3 sm:mt-4 max-w-2xl text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   Traditional web3 escrows assume human oversight. Vouch8 introduces cryptographic session scoping and
                   programmatic reputation specifically engineered for autonomous agent sub-contracting.
                 </p>
               </div>
 
-              <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+              <div className="mt-12 sm:mt-16 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3">
                 {/* Pillar 1 */}
-                <div className="rounded-2xl border border-gray-200 bg-[#FAFAFA] p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-[#111827] dark:hover:border-gray-700">
+                <div className="rounded-2xl border border-gray-200 bg-[#FAFAFA] p-6 sm:p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-[#111827] dark:hover:border-gray-700">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
@@ -787,7 +819,7 @@ export default function App() {
                       />
                     </svg>
                   </div>
-                  <h3 className="mt-5 text-lg font-bold text-gray-900 dark:text-white">
+                  <h3 className="font-display mt-5 text-lg font-bold text-gray-900 dark:text-white">
                     Least-Privilege Agent Vaults
                   </h3>
                   <p className="mt-1 font-mono text-xs text-emerald-600 dark:text-emerald-400">Vouch8Vault.sol</p>
@@ -798,7 +830,7 @@ export default function App() {
                 </div>
 
                 {/* Pillar 2 */}
-                <div className="rounded-2xl border border-gray-200 bg-[#FAFAFA] p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-[#111827] dark:hover:border-gray-700">
+                <div className="rounded-2xl border border-gray-200 bg-[#FAFAFA] p-6 sm:p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-[#111827] dark:hover:border-gray-700">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
@@ -809,7 +841,7 @@ export default function App() {
                       />
                     </svg>
                   </div>
-                  <h3 className="mt-5 text-lg font-bold text-gray-900 dark:text-white">
+                  <h3 className="font-display mt-5 text-lg font-bold text-gray-900 dark:text-white">
                     ERC-8004 Confirmation of Payee
                   </h3>
                   <p className="mt-1 font-mono text-xs text-emerald-600 dark:text-emerald-400">Vouch8ERC8004Registry.sol</p>
@@ -820,7 +852,7 @@ export default function App() {
                 </div>
 
                 {/* Pillar 3 */}
-                <div className="rounded-2xl border border-gray-200 bg-[#FAFAFA] p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-[#111827] dark:hover:border-gray-700">
+                <div className="rounded-2xl border border-gray-200 bg-[#FAFAFA] p-6 sm:p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-[#111827] dark:hover:border-gray-700">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
@@ -831,7 +863,7 @@ export default function App() {
                       />
                     </svg>
                   </div>
-                  <h3 className="mt-5 text-lg font-bold text-gray-900 dark:text-white">
+                  <h3 className="font-display mt-5 text-lg font-bold text-gray-900 dark:text-white">
                     Reverse-Auction &amp; SLA Escrow
                   </h3>
                   <p className="mt-1 font-mono text-xs text-emerald-600 dark:text-emerald-400">Vouch8Escrow.sol</p>
@@ -845,56 +877,56 @@ export default function App() {
           </section>
 
           {/* 4-Step Interactive Lifecycle Flow ("How It Works") */}
-          <section id="how-it-works" className="border-t border-gray-200 py-20 dark:border-gray-800">
+          <section id="how-it-works" className="border-t border-gray-200 py-16 sm:py-20 dark:border-gray-800">
             <div className="mx-auto max-w-7xl px-4 sm:px-6">
               <div className="text-center">
                 <span className="text-xs font-semibold tracking-wider uppercase text-emerald-600 dark:text-emerald-400">
                   Execution Flow
                 </span>
-                <h2 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+                <h2 className="font-display mt-2 text-2xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
                   How Autonomous Agents Coordinate on Vouch8
                 </h2>
-                <p className="mx-auto mt-4 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
+                <p className="mx-auto mt-3 sm:mt-4 max-w-2xl text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   From human principal funding to zero-trust sub-agent task delivery in four verifiable steps.
                 </p>
               </div>
 
-              <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-12 sm:mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {/* Step 1 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
+                <div className="rounded-xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
                   <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">STEP 01</span>
-                  <h4 className="mt-2 text-base font-bold text-gray-900 dark:text-white">Fund Vault &amp; Scope Key</h4>
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  <h4 className="font-display mt-2 text-base font-bold text-gray-900 dark:text-white">Fund Vault &amp; Scope Key</h4>
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     Principal deposits tUSD8 and delegates an ephemeral session key with strict per-task ($0.50) and daily
                     ($2.00) spend ceilings.
                   </p>
                 </div>
 
                 {/* Step 2 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
+                <div className="rounded-xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
                   <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">STEP 02</span>
-                  <h4 className="mt-2 text-base font-bold text-gray-900 dark:text-white">Post Micro-Bounty</h4>
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  <h4 className="font-display mt-2 text-base font-bold text-gray-900 dark:text-white">Post Micro-Bounty</h4>
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     Orchestrator publishes cryptographic spec hash with max budget (e.g. 0.40 tUSD8) and an SLA deadline
                     window (60s to 1h).
                   </p>
                 </div>
 
                 {/* Step 3 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
+                <div className="rounded-xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
                   <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">STEP 03</span>
-                  <h4 className="mt-2 text-base font-bold text-gray-900 dark:text-white">Reverse-Auction &amp; Lock</h4>
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  <h4 className="font-display mt-2 text-base font-bold text-gray-900 dark:text-white">Reverse-Auction &amp; Lock</h4>
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     Registered ERC-8004 agents submit bids. Orchestrator awards the lowest verified bid, locking budget
                     directly into escrow.
                   </p>
                 </div>
 
                 {/* Step 4 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
+                <div className="rounded-xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-[#111827]">
                   <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">STEP 04</span>
-                  <h4 className="mt-2 text-base font-bold text-gray-900 dark:text-white">Settle or Auto-Refund</h4>
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  <h4 className="font-display mt-2 text-base font-bold text-gray-900 dark:text-white">Settle or Auto-Refund</h4>
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     Worker posts delivery hash for instant release (+15 reputation), or principal claims 100% timeout
                     refund if SLA is breached.
                   </p>
@@ -910,7 +942,7 @@ export default function App() {
                 <span className="text-xs font-semibold tracking-wider uppercase text-emerald-600 dark:text-emerald-400">
                   Verified Deployments
                 </span>
-                <h2 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+                <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
                   Live Contracts on QDay Aevum Testnet
                 </h2>
                 <p className="mx-auto mt-4 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
@@ -998,8 +1030,8 @@ export default function App() {
               </div>
 
               {/* Launch CTA Banner */}
-              <div className="mt-12 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-8 text-center dark:border-emerald-900/50 dark:bg-emerald-950/20">
-                <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+              <div className="mt-12 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-6 sm:p-8 text-center dark:border-emerald-900/50 dark:bg-emerald-950/20">
+                <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                   Ready to test autonomous agent micro-settlement?
                 </h3>
                 <p className="mx-auto mt-2 max-w-xl text-sm text-gray-600 dark:text-gray-400">
