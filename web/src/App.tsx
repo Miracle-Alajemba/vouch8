@@ -239,6 +239,105 @@ export default function App() {
     return () => clearInterval(interval);
   }, [inspectedTask]);
 
+  // ================= 1-CLICK TUSD8 FAUCET STATE =================
+  const [faucetStatus, setFaucetStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [faucetTxHash, setFaucetTxHash] = useState<string | null>(null);
+  const [faucetErrorMsg, setFaucetErrorMsg] = useState<string | null>(null);
+  const [faucetCooldownRemainingMs, setFaucetCooldownRemainingMs] = useState<number>(0);
+
+  const formatCooldown = (ms: number) => {
+    const totalSecs = Math.max(0, Math.floor(ms / 1000));
+    const hours = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+    if (hours > 0) return `${hours}h ${mins}m`;
+    if (mins > 0) return `${mins}m ${secs}s`;
+    return `${secs}s`;
+  };
+
+  // Cooldown countdown timer tick
+  useEffect(() => {
+    if (faucetCooldownRemainingMs <= 0) return;
+    const interval = setInterval(() => {
+      setFaucetCooldownRemainingMs((prev) => {
+        if (prev <= 1000) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [faucetCooldownRemainingMs]);
+
+  // Check cooldown status for connected address
+  useEffect(() => {
+    if (!address) {
+      setFaucetCooldownRemainingMs(0);
+      return;
+    }
+    let isMounted = true;
+    fetch(`/api/faucet?address=${address}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isMounted || !data) return;
+        if (!data.canClaim && data.remainingMs > 0) {
+          setFaucetCooldownRemainingMs(data.remainingMs);
+        } else {
+          setFaucetCooldownRemainingMs(0);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [address]);
+
+  const handleRequestFaucet = async () => {
+    if (!address) {
+      addLog("ERROR", "Please connect your wallet first to request test tUSD8.");
+      return;
+    }
+    try {
+      setFaucetStatus("pending");
+      setFaucetErrorMsg(null);
+      setFaucetTxHash(null);
+      addLog("PENDING", "Requesting 10 tUSD8 from protocol faucet...");
+
+      const res = await fetch("/api/faucet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Faucet claim failed.");
+      }
+
+      setFaucetStatus("success");
+      setFaucetTxHash(data.txHash);
+      if (data.nextEligibleTime) {
+        setFaucetCooldownRemainingMs(Math.max(0, data.nextEligibleTime - Date.now()));
+      }
+      addLog("SUCCESS", `Dripped 10 tUSD8 to ${address.slice(0, 6)}...${address.slice(-4)}!`, data.txHash);
+      refetchWallet();
+      refetchVault();
+    } catch (err: unknown) {
+      setFaucetStatus("error");
+      const msg = err instanceof Error ? err.message : String(err);
+      setFaucetErrorMsg(msg);
+      addLog("ERROR", `Faucet request failed: ${msg}`);
+      if (msg.includes("Cooldown active")) {
+        fetch(`/api/faucet?address=${address}`)
+          .then((r) => r.json())
+          .then((d) => {
+            if (d?.remainingMs) setFaucetCooldownRemainingMs(d.remainingMs);
+          })
+          .catch(() => {});
+      }
+    }
+  };
+
   // Stepper state
   const isStage1Complete = (vaultBal ?? 0n) > 0n;
   const isStage2Complete =
@@ -1070,6 +1169,25 @@ export default function App() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              {/* Faucet Trigger Button */}
+              <button
+                disabled={faucetStatus === "pending" || faucetCooldownRemainingMs > 0 || !isConnected}
+                onClick={handleRequestFaucet}
+                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-950/70"
+                title="Claim 10 test tUSD8 from the protocol faucet"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                <span>
+                  {faucetStatus === "pending"
+                    ? "Dripping..."
+                    : faucetCooldownRemainingMs > 0
+                    ? `Cooldown (${formatCooldown(faucetCooldownRemainingMs)})`
+                    : "Get test tUSD8"}
+                </span>
+              </button>
+
               <button
                 onClick={() => setView("landing")}
                 className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -1078,6 +1196,44 @@ export default function App() {
               </button>
             </div>
           </div>
+
+          {/* Faucet Notification Banner */}
+          {faucetStatus === "success" && faucetTxHash && (
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-xs text-emerald-800 shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold">✓ 10 tUSD8 Sent!</span>
+                <span className="text-gray-600 dark:text-gray-400">Tokens transferred to your wallet on QDay Aevum.</span>
+                <a
+                  href={`https://explorer-test.qday.info/tx/${faucetTxHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono font-medium underline hover:text-emerald-950 dark:hover:text-emerald-100"
+                >
+                  View Tx ↗
+                </a>
+              </div>
+              <button
+                onClick={() => setFaucetStatus("idle")}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+          {faucetStatus === "error" && faucetErrorMsg && (
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-xs text-amber-800 shadow-sm dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">⚠️ Faucet Notice:</span>
+                <span>{faucetErrorMsg}</span>
+              </div>
+              <button
+                onClick={() => setFaucetStatus("idle")}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+          )}
 
           {/* ================= 4-CARD PROTOCOL TELEMETRY STRIP ================= */}
           <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -1302,6 +1458,81 @@ export default function App() {
             </div>
           </section>
 
+          {/* ================= ONBOARDING EMPTY STATE (when vault balance is 0) ================= */}
+          {(vaultBal === undefined || vaultBal === 0n) && (
+            <section className="mb-8 rounded-xl border border-emerald-200 bg-white p-5 sm:p-6 shadow-sm dark:border-emerald-900/60 dark:bg-[#111827]">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                        Onboarding: Vault Balance is 0.00 tUSD8
+                      </h3>
+                      <span className="rounded bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                        Step 1 Required
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 max-w-xl leading-relaxed">
+                      Your Vouch8 Vault currently holds 0.00 tUSD8. Claim 10 test tUSD8 from the 1-click faucet to fund your vault, scope session keys, and dispatch autonomous agent reverse-auctions.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                  <button
+                    disabled={faucetStatus === "pending" || faucetCooldownRemainingMs > 0 || !isConnected}
+                    onClick={handleRequestFaucet}
+                    className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>
+                      {faucetStatus === "pending"
+                        ? "Dripping 10 tUSD8..."
+                        : faucetCooldownRemainingMs > 0
+                        ? `Cooldown (${formatCooldown(faucetCooldownRemainingMs)})`
+                        : "Get test tUSD8 (10 tUSD8)"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Inline status feedback */}
+              {faucetStatus === "success" && faucetTxHash && (
+                <div className="mt-4 flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold">✓ 10 tUSD8 claimed!</span>
+                    <span>Deposit your tokens in the Treasury card below to finish onboarding.</span>
+                    <a
+                      href={`https://explorer-test.qday.info/tx/${faucetTxHash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono font-medium underline hover:text-emerald-950 dark:hover:text-emerald-100"
+                    >
+                      Explorer ↗
+                    </a>
+                  </div>
+                  <button onClick={() => setFaucetStatus("idle")} className="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+              )}
+              {faucetStatus === "error" && faucetErrorMsg && (
+                <div className="mt-4 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50/60 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-semibold">⚠️</span>
+                    <span>{faucetErrorMsg}</span>
+                  </div>
+                  <button onClick={() => setFaucetStatus("idle")} className="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+              )}
+            </section>
+          )}
+
           {/* ================= TWO-COLUMN WORKSPACE ================= */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {/* ================= LEFT COLUMN: TREASURY & GUARDRAILS ================= */}
@@ -1376,6 +1607,24 @@ export default function App() {
                         </button>
                       ))}
                     </div>
+
+                    {walletTusd8 !== undefined && walletTusd8 === 0n && (
+                      <div className="flex items-center justify-between rounded-lg border border-dashed border-emerald-300 bg-emerald-50/50 p-2 text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
+                        <span>Need funds to deposit?</span>
+                        <button
+                          type="button"
+                          disabled={faucetStatus === "pending" || faucetCooldownRemainingMs > 0 || !isConnected}
+                          onClick={handleRequestFaucet}
+                          className="font-semibold underline hover:text-emerald-950 disabled:opacity-50 dark:hover:text-emerald-100"
+                        >
+                          {faucetStatus === "pending"
+                            ? "Dripping..."
+                            : faucetCooldownRemainingMs > 0
+                            ? `Cooldown (${formatCooldown(faucetCooldownRemainingMs)})`
+                            : "Claim 10 test tUSD8 ↗"}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="mt-5 space-y-4">

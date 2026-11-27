@@ -105,6 +105,20 @@ npm run dev
 
 Visit `http://localhost:5173` in your browser.
 
+#### Testnet tUSD8 Faucet Configuration
+
+The web application includes a 1-click testnet faucet (`/api/faucet`) providing 10 `tUSD8` per address with a 24-hour cooldown. To enable automatic drips from your own funded faucet wallet, copy `.env.example` in `web/`:
+
+```bash
+cp web/.env.example web/.env.local
+```
+
+Set the private key of your funded faucet wallet in `web/.env.local`:
+```env
+FAUCET_PRIVATE_KEY=0x...your_private_key...
+```
+*(The private key is strictly server-side and never exposed to the client).*
+
 ---
 
 ## Architecture & Workflow
