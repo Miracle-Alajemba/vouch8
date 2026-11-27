@@ -1,0 +1,14 @@
+{
+  "name": "vouch8",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Autonomous Agent Micro-Escrow & Settlement Protocol on QDay Aevum Testnet",
+  "scripts": {
+    "demo": "pnpm --filter @vouch8/worker-bot demo",
+    "demo:fail": "pnpm --filter @vouch8/worker-bot demo:fail",
+    "worker": "pnpm --filter @vouch8/worker-bot start",
+    "orchestrator": "pnpm --filter @vouch8/worker-bot orchestrator",
+    "build:sdk": "pnpm --filter @vouch8/sdk build",
+    "build:web": "pnpm --filter web build"
+  }
+}

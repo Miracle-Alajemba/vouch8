@@ -121,6 +121,64 @@ FAUCET_PRIVATE_KEY=0x...your_private_key...
 
 ---
 
+### 4. Autonomous Worker Bot (`packages/worker-bot/`)
+
+An autonomous agent loop running on QDay Aevum Testnet that handles the full **A2A (Agent-to-Agent)** lifecycle:
+- **ERC-8004 Verification**: Automatically checks or mints an on-chain V8ID identity passport before participating.
+- **Reverse-Auction Bidding**: Polls `Vouch8Escrow` for open bounties, filters by `minReputation` and budget, and places undercutting bids down to `MIN_PRICE`.
+- **Pluggable Execution Engine**: When awarded, executes the task spec (supports fetching remote URLs and summarizing via the Anthropic Claude API if `ANTHROPIC_API_KEY` is present, or a deterministic attestation engine).
+- **On-Time Settlement & Slashing**: Computes `resultHash` and calls `settleTask` before the SLA deadline to earn payouts and **+15 reputation score**. Supports deliberate SLA timeout tests via `--fail` to demonstrate automatic **100% refund recovery** and **-30 reputation slashing**.
+- **Resilient & Fault-Tolerant**: Implements exponential backoff retry logic for nonce mismatches, transient RPC timeouts, and rate limits.
+
+#### One-Command Demo Loop
+
+Run the entire end-to-end A2A loop (Orchestrator session key deposit $\rightarrow$ Bounty posting $\rightarrow$ Reverse-auction bid $\rightarrow$ Escrow award $\rightarrow$ Execution $\rightarrow$ Settlement) with a single command from the root:
+
+```bash
+# Run successful A2A loop (+15 reputation payout)
+pnpm demo
+
+# Run failure simulation (--fail flag: misses deadline to demo 100% refund & -30 slash)
+pnpm demo:fail
+```
+
+#### Running Standalone Agents
+
+You can also run worker daemons or orchestrators independently:
+
+```bash
+# 1. Start autonomous worker daemon (polls for bounties continuously)
+pnpm worker
+
+# 2. Start worker in failure simulation mode
+pnpm --filter @vouch8/worker-bot worker:fail
+
+# 3. Post a demo bounty from the orchestrator CLI
+pnpm orchestrator
+```
+
+#### Environment Configuration
+
+Copy the example environment file in `packages/worker-bot/`:
+
+```bash
+cp packages/worker-bot/.env.example packages/worker-bot/.env
+```
+
+| Variable | Description | Default |
+|---|---|---|
+| `RPC_URL` | QDay Aevum Testnet RPC endpoint | `https://rpc-test.qday.info` |
+| `WORKER_PRIVATE_KEY` | Private key of the worker agent wallet | *Demo fallback key provided* |
+| `ORCHESTRATOR_PRIVATE_KEY` | Private key for the orchestrator session key wallet | Optional (falls back to worker key) |
+| `MIN_PRICE` | Minimum tUSD8 price floor for bids | `0.10` |
+| `UNDERCUT_PERCENT` | Percentage discount applied when undercutting open bounties | `10` |
+| `MAX_BIDS_PER_HOUR` | Maximum number of bids submitted per hour (rate limiting) | `30` |
+| `POLL_INTERVAL_MS` | Escrow polling frequency in milliseconds | `3000` |
+| `ANTHROPIC_API_KEY` | (Optional) Anthropic Claude API key for AI task execution | *Uses deterministic attestation if unset* |
+| `FAIL_MODE` | Set to `true` or pass `--fail` flag to simulate deadline expiration | `false` |
+
+---
+
 ## Architecture & Workflow
 
 ```mermaid

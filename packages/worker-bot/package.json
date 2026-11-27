@@ -1,0 +1,28 @@
+{
+  "name": "@vouch8/worker-bot",
+  "version": "0.1.0",
+  "description": "Autonomous AI Worker Agent for Vouch8 Reverse-Auction Escrow on QDay Aevum Testnet",
+  "private": true,
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "worker": "tsx src/index.ts",
+    "worker:fail": "tsx src/index.ts --fail",
+    "orchestrator": "tsx src/orchestrator.ts",
+    "demo": "tsx src/demo.ts",
+    "demo:fail": "tsx src/demo.ts --fail",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@vouch8/sdk": "workspace:*",
+    "dotenv": "^16.4.7",
+    "picocolors": "^1.1.1",
+    "viem": "^2.58.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
